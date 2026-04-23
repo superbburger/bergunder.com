@@ -1,0 +1,287 @@
+:root {
+  margin: 0;
+  padding: 0;
+  --accent-500: #2d4178;
+  --neutral-100: #fcf4f1;
+}
+
+html {
+  font-size: 1em;
+  font-family: "Jost", "Futura", "Futura PT", -apple-system, BlinkMacSystemFont,
+    "Onest", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--neutral-100);
+  color: #202020;
+  font-size: 1rem;
+}
+a {
+  color: var(--accent-500);
+}
+a:hover {
+  opacity: 0.8;
+}
+a:active {
+  opacity: 0.9;
+}
+
+/*
+*
+* TYPOGRAPHY *
+*
+*/
+
+h1,
+.sans-7 {
+  font-size: 3rem;
+  font-weight: 500;
+  line-height: 3rem;
+  padding: 0;
+  margin: 0;
+  letter-spacing: -0.03em;
+}
+
+h2,
+.sans-6 {
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 2rem;
+  padding: 0;
+  margin: 0;
+  vertical-align: baseline;
+  letter-spacing: -0.03em;
+}
+
+h3,
+.sans-5,
+.title {
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+  padding: 0;
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+h4,
+.project {
+  font-size: 1.15rem;
+  font-weight: 400;
+  line-height: 1.25rem;
+}
+
+p {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  vertical-align: baseline;
+}
+
+p.small,
+.date {
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+  opacity: 0.8;
+  vertical-align: baseline;
+}
+
+/*
+*
+* LAYOUT *
+*
+*/
+.heading {
+  top: 0;
+  left: 0;
+  display: flex;
+  gap: 12px;
+  width: 100dvw;
+  justify-content: space-between;
+  background-color: var(--neutral-100);
+  border-bottom: solid 1px var(--accent-500);
+  z-index: 100;
+}
+.heading div {
+  background-color: var(--accent-500);
+  color: #fff;
+  padding: 8px 12px;
+}
+.container {
+  padding: 1rem 0 0 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+  gap: 2rem;
+}
+.intro {
+  color: #202020;
+  grid-column: 1 / -1;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  align-items: baseline;
+}
+.intro p,
+.intro h1 {
+  max-width: 40ch;
+}
+
+.item {
+  grid-column: span 2;
+  min-height: 480px;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  border-top: solid 1px var(--accent-500);
+  padding-top: 8px;
+  margin-bottom: 8rem;
+  opacity: 0;
+  transition: opacity 0.6s ease-out, transform 0.75s ease-out;
+}
+
+div.info {
+  position: sticky;
+  top: 0;
+  display: grid;
+  align-content: start;
+  align-self: flex-start;
+  grid-column: 1;
+  grid-row: 1;
+  grid-template-columns: 3fr 1fr;
+  grid-template-areas: "title tags" "project tags" "releaseDate tags" "description tags" "credits .";
+}
+.image-container {
+  display: flex;
+  grid-column: 2;
+  grid-row: 1;
+}
+img.image {
+  width: 100%;
+}
+
+@media screen and (max-width: 960px) {
+  .item {
+    grid-template-columns: 1fr;
+  }
+  .intro {
+    grid-template-columns: 1fr;
+  }
+  div.info {
+    position: relative;
+    top: auto;
+    grid-row: 2;
+    grid-column: 1;
+  }
+  div.image-container {
+    grid-row: 1;
+    grid-column: 1;
+  }
+}
+
+.image.visible,
+.item.visible {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+.item .title,
+.item .project,
+.item .date {
+  color: #444;
+}
+
+.info .tags {
+  grid-area: tags;
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  gap: 0.25rem;
+}
+
+.item .badge {
+  background-color: var(--accent-500);
+  color: #fff;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  padding: 0.5rem 0.25rem;
+  height: max-content;
+  flex-basis: 0;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+.item .title {
+  background-color: var(--accent-500);
+  color: var(--neutral-100);
+  padding: 8px 12px;
+  width: fit-content;
+}
+.item .project {
+  padding: 8px 12px;
+  color: var(--accent-500);
+}
+
+.item .category {
+  grid-column: span 4;
+}
+
+.item .date {
+  grid-area: releaseDate;
+  padding: 0 12px;
+}
+
+.item .description,
+.item .credits {
+  grid-area: description;
+  padding: 12px;
+  display: flex;
+  justify-content: end;
+  align-items: end;
+  opacity: 1;
+}
+.item .credits {
+  grid-area: credits;
+}
+.description p,
+.credits p {
+  max-width: 32rem;
+}
+
+/*
+*
+* COMPONENTS *
+*
+*/
+
+.btn {
+  display: inline-flex;
+  border: solid 1px currentColor;
+  border-radius: 3rem;
+  padding: 0.5rem;
+  width: auto;
+  text-align: center;
+  align-content: center;
+  justify-content: center;
+}
+.btn.show {
+  opacity: 0;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+.btn.show:hover {
+  background-color: #00000020;
+}
+.item .info .btn.show:hover + .description {
+  opacity: 1;
+}
+.item:hover .btn.show {
+  opacity: 1;
+}
