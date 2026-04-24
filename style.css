@@ -48,7 +48,7 @@ a:active {
 
 h1,
 .sans-7 {
-  font-size: 3rem;
+  font-size: 4rem;
   font-weight: 700;
   line-height: 3rem;
   padding: 0;
@@ -60,7 +60,7 @@ h1,
 
 h2,
 .sans-6 {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
   line-height: 2rem;
   padding: 0;
@@ -74,7 +74,7 @@ h2,
 h3,
 .sans-5,
 .title {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 500;
   line-height: 1.5rem;
   padding: 0;
@@ -224,13 +224,16 @@ img.image {
   padding: 0.5rem 0.25rem;
   height: max-content;
   flex-basis: 0;
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
+  writing-mode: vertical-lr;
+  text-orientation: sideways;
+  white-space: nowrap;
 }
 
 .item .title {
-  background-color: var(--accent-500);
-  color: var(--neutral-100);
+  /* background-color: var(--accent-500); */
+  /* color: var(--neutral-100); */
+  color: var(--accent-500);
+
   padding: 8px 12px;
   width: fit-content;
 }
