@@ -169,7 +169,6 @@ div.info {
   grid-template-areas: "title tags" "project tags" "releaseDate tags" "description tags" "credits .";
 }
 .image-container {
-  display: flex;
   grid-column: 2;
   grid-row: 1;
 }
