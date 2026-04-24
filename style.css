@@ -7,8 +7,14 @@
 
 html {
   font-size: 1em;
-  font-family: "Jost", "Futura", "Futura PT", -apple-system, BlinkMacSystemFont,
-    "Onest", sans-serif;
+  font-family:
+    "Lilex",
+    "Helvetica Neue",
+    "Helvetica",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Onest",
+    sans-serif;
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
@@ -43,22 +49,26 @@ a:active {
 h1,
 .sans-7 {
   font-size: 3rem;
-  font-weight: 500;
+  font-weight: 700;
   line-height: 3rem;
   padding: 0;
   margin: 0;
   letter-spacing: -0.03em;
+  font-family:
+    "Bricolage Grotesque", "Helvetica Neue", Helvetica, sans-serif, Arial;
 }
 
 h2,
 .sans-6 {
   font-size: 2rem;
-  font-weight: 500;
+  font-weight: 700;
   line-height: 2rem;
   padding: 0;
   margin: 0;
   vertical-align: baseline;
   letter-spacing: -0.03em;
+  font-family:
+    "Bricolage Grotesque", "Helvetica Neue", Helvetica, sans-serif, Arial;
 }
 
 h3,
@@ -142,7 +152,9 @@ p.small,
   padding-top: 8px;
   margin-bottom: 8rem;
   opacity: 0;
-  transition: opacity 0.6s ease-out, transform 0.75s ease-out;
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.75s ease-out;
 }
 
 div.info {
