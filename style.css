@@ -1,14 +1,14 @@
 :root {
   margin: 0;
   padding: 0;
-  --accent-500: #2d4178;
+  --accent-500: #e04908;
   --neutral-100: #fcf4f1;
+  --primary: #333333;
 }
 
 html {
-  font-size: 14px;
+  font-size: 16px;
   font-family:
-    "Lilex",
     "Helvetica Neue",
     "Helvetica",
     -apple-system,
@@ -26,12 +26,13 @@ html {
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--neutral-100);
-  color: #202020;
+  background-color: #fff;
+  color: var(--primary);
   font-size: 1rem;
 }
 a {
-  color: var(--accent-500);
+  color: var(--primary);
+  text-decoration: none;
 }
 a:hover {
   opacity: 0.8;
@@ -46,46 +47,45 @@ a:active {
 *
 */
 
-h1,
-.sans-7 {
+h1 {
   font-size: 4rem;
-  font-weight: 700;
-  line-height: 3rem;
+  font-weight: 400;
+  line-height: 3.75rem;
   padding: 0;
   margin: 0;
   letter-spacing: -0.03em;
-  font-family:
-    "Bricolage Grotesque", "Helvetica Neue", Helvetica, sans-serif, Arial;
+  font-family: "Helvetica Neue", Helvetica, sans-serif, Arial;
 }
 
 h2,
-.sans-6 {
+.title {
   font-size: 2.5rem;
-  font-weight: 700;
-  line-height: 2rem;
+  font-weight: 400;
+  line-height: 2.25rem;
   padding: 0;
   margin: 0;
   vertical-align: baseline;
   letter-spacing: -0.03em;
-  font-family:
-    "Bricolage Grotesque", "Helvetica Neue", Helvetica, sans-serif, Arial;
+  font-family: "Helvetica Neue", Helvetica, sans-serif, Arial;
 }
 
-h3,
-.sans-5,
-.title {
-  font-size: 2rem;
-  font-weight: 500;
-  line-height: 1.5rem;
+h3 {
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 2rem;
   padding: 0;
   margin: 0;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
 }
 h4,
 .project {
   font-size: 1.15rem;
   font-weight: 400;
   line-height: 1.25rem;
+  padding: 0;
+  margin: 0;
+  text-transform: uppercase;
 }
 
 p {
@@ -108,30 +108,44 @@ p.small,
 *
 */
 .heading {
-  top: 0;
-  left: 0;
+  top: 12px;
+  left: 12px;
   display: flex;
+  position: fixed;
+  align-items: baseline;
   gap: 12px;
-  width: 100dvw;
+  width: 100%;
+  max-width: calc(100vw - 36px);
   justify-content: space-between;
-  background-color: var(--neutral-100);
-  border-bottom: solid 1px var(--accent-500);
+  background-color: #fff;
+  -webkit-box-shadow: 0px 8px 8px 0px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 8px 8px 0px rgba(0, 0, 0, 0.2);
   z-index: 100;
 }
 .heading div {
-  background-color: var(--accent-500);
-  color: #fff;
   padding: 8px 12px;
 }
+.heading h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 2rem;
+  letter-spacing: -0.02em;
+}
+.heading span#headingPhrase {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 2rem;
+  letter-spacing: -0.02em;
+}
 .container {
-  padding: 1rem 0 0 0;
+  padding: 4rem 0 0 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: start;
   gap: 2rem;
 }
 .intro {
-  color: #202020;
+  color: var(--primary);
   grid-column: 1 / -1;
   padding: 12px;
   display: grid;
@@ -148,7 +162,7 @@ p.small,
   min-height: 480px;
   display: grid;
   grid-template-columns: 1fr 2fr;
-  border-top: solid 1px var(--accent-500);
+  border-top: solid 1px #333;
   padding-top: 8px;
   margin-bottom: 8rem;
   opacity: 0;
@@ -165,8 +179,9 @@ div.info {
   align-self: flex-start;
   grid-column: 1;
   grid-row: 1;
-  grid-template-columns: 3fr 1fr;
+  grid-template-columns: 5fr 1fr;
   grid-template-areas: "title tags" "project tags" "releaseDate tags" "description tags" "credits .";
+  padding-top: 4rem;
 }
 .image-container {
   grid-column: 2;
@@ -205,7 +220,7 @@ img.image {
 .item .title,
 .item .project,
 .item .date {
-  color: #444;
+  color: var(--primary);
 }
 
 .info .tags {
@@ -217,8 +232,11 @@ img.image {
 }
 
 .item .badge {
-  background-color: var(--accent-500);
-  color: #fff;
+  background-color: #fff;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: 2px;
+  margin: 2px;
   font-size: 0.75rem;
   line-height: 1rem;
   padding: 0.5rem 0.25rem;
@@ -230,16 +248,17 @@ img.image {
 }
 
 .item .title {
-  /* background-color: var(--accent-500); */
-  /* color: var(--neutral-100); */
-  color: var(--accent-500);
-
+  color: var(--primary);
   padding: 8px 12px;
   width: fit-content;
 }
 .item .project {
-  padding: 8px 12px;
-  color: var(--accent-500);
+  margin: 8px 12px;
+  color: var(--primary);
+  padding: 0.5rem;
+  border: 1px solid var(--primary);
+  border-radius: 0.25rem;
+  justify-self: start;
 }
 
 .item .category {
@@ -249,6 +268,13 @@ img.image {
 .item .date {
   grid-area: releaseDate;
   padding: 0 12px;
+  justify-self: start;
+}
+.item .date a {
+  background-color: var(--primary);
+  color: #fff;
+  padding: 0.5rem;
+  border-radius: 4rem;
 }
 
 .item .description,
