@@ -117,14 +117,10 @@ p.small,
   width: 100%;
   max-width: calc(100vw - 36px);
   justify-content: space-between;
-  background-color: #fff;
-  -webkit-box-shadow: 0px 8px 8px 0px rgba(0, 0, 0, 0.2);
-  box-shadow: 0px 8px 8px 0px rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0);
   z-index: 100;
 }
-.heading div {
-  padding: 8px 12px;
-}
+
 .heading h2 {
   font-size: 1.25rem;
   font-weight: 600;
