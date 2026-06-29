@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Film Archive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0e0e0e;
+      --paper:     #f0ede6;
+      --amber:     #d4a853;
+      --amber-dim: #6b5229;
+      --rail:      #1c1c1c;
+      --sprocket:  #161616;
+      --hole:      #080808;
+      --mono:      'Space Mono', monospace;
+      --serif:     'IM Fell English', Georgia, serif;
+      --sprocket-h: 28px;
+      --hole-size:  14px;
+    }
+
+    html { font-size: 16px; }
+
+    body {
+      background: var(--bg);
+      color: var(--paper);
+      font-family: var(--mono);
+      min-height: 100vh;
+      padding: 0 0 80px;
+    }
+
+    /* ── Header ── */
+    header {
+      padding: 48px 40px 32px;
+      border-bottom: 1px solid #222;
+      display: flex;
+      align-items: baseline;
+      gap: 24px;
+    }
+    header h1 {
+      font-family: var(--serif);
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--paper);
+      letter-spacing: -0.01em;
+    }
+    header .tagline {
+      font-size: 0.7rem;
+      color: var(--amber-dim);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    /* ── Loading / error ── */
+    #status {
+      padding: 60px 40px;
+      font-size: 0.75rem;
+      color: var(--amber-dim);
+      letter-spacing: 0.1em;
+    }
+
+    /* ── Roll section ── */
+    .roll {
+      margin-top: 56px;
+    }
+
+    .roll-header {
+      padding: 0 40px 14px;
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+    }
+    .roll-number {
+      font-size: 0.65rem;
+      color: var(--amber);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .roll-title {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 1.15rem;
+      color: var(--paper);
+    }
+    .roll-count {
+      font-size: 0.65rem;
+      color: #444;
+      margin-left: auto;
+      letter-spacing: 0.1em;
+    }
+
+    /* ── Filmstrip wrapper ── */
+    .filmstrip-outer {
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Fade edges */
+    .filmstrip-outer::before,
+    .filmstrip-outer::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 60px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .filmstrip-outer::before { left: 0;  background: linear-gradient(to right, var(--bg), transparent); }
+    .filmstrip-outer::after  { right: 0; background: linear-gradient(to left,  var(--bg), transparent); }
+
+    /* ── Filmstrip track ── */
+    .filmstrip {
+      display: flex;
+      align-items: stretch;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      cursor: grab;
+      user-select: none;
+      padding: 0 40px;
+      gap: 0;
+    }
+    .filmstrip::-webkit-scrollbar { display: none; }
+    .filmstrip.grabbing { cursor: grabbing; }
+
+    /* Sprocket rail (top and bottom) - rendered as pseudo-elements on filmstrip */
+    .filmstrip-rail {
+      background: var(--rail);
+      height: var(--sprocket-h);
+      flex: none;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 0 12px;
+      position: relative;
+    }
+
+    /* ── Frame container ── */
+    .frame-wrapper {
+      flex: none;
+      display: flex;
+      flex-direction: column;
+      scroll-snap-align: start;
+    }
+
+    .sprocket-rail {
+      background: var(--rail);
+      height: var(--sprocket-h);
+      display: flex;
+      align-items: center;
+      padding: 0 6px;
+      gap: 0;
+    }
+    .sprocket-rail.top { border-bottom: 1px solid #111; }
+    .sprocket-rail.bottom { border-top: 1px solid #111; }
+
+    .sprocket-hole {
+      width: var(--hole-size);
+      height: var(--hole-size);
+      border-radius: 2px;
+      background: var(--hole);
+      border: 1px solid #0a0a0a;
+      box-shadow: inset 0 0 3px rgba(0,0,0,0.8);
+      flex-shrink: 0;
+    }
+    /* Gap between holes is dynamic via margin */
+
+    /* ── Frame image area ── */
+    .frame {
+      background: #111;
+      position: relative;
+      overflow: hidden;
+      border-left: 3px solid #0e0e0e;
+      border-right: 3px solid #0e0e0e;
+    }
+    .frame img {
+      display: block;
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+      transition: transform 0.35s ease, filter 0.35s ease;
+      filter: brightness(0.92) contrast(1.05);
+      pointer-events: none;
+    }
+    .frame:hover img {
+      transform: scale(1.03);
+      filter: brightness(1) contrast(1.05);
+    }
+
+    /* Frame number label */
+    .frame-num {
+      position: absolute;
+      bottom: 5px;
+      right: 7px;
+      font-size: 0.55rem;
+      color: rgba(212,168,83,0.6);
+      letter-spacing: 0.12em;
+      font-family: var(--mono);
+      line-height: 1;
+    }
+
+    /* ── Lightbox ── */
+    #lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+    }
+    #lightbox.open { display: flex; }
+
+    #lightbox img {
+      max-width: min(90vw, 1200px);
+      max-height: 82vh;
+      object-fit: contain;
+      box-shadow: 0 0 80px rgba(0,0,0,0.8);
+    }
+    #lightbox-meta {
+      font-size: 0.65rem;
+      color: var(--amber-dim);
+      letter-spacing: 0.18em;
+      text-align: center;
+    }
+
+    #lightbox-close {
+      position: fixed;
+      top: 24px; right: 28px;
+      background: none;
+      border: none;
+      color: var(--paper);
+      font-family: var(--mono);
+      font-size: 1.4rem;
+      cursor: pointer;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+    }
+    #lightbox-close:hover { opacity: 1; }
+
+    #lightbox-prev, #lightbox-next {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--paper);
+      font-family: var(--mono);
+      font-size: 1.5rem;
+      cursor: pointer;
+      opacity: 0.35;
+      transition: opacity 0.2s;
+      padding: 20px 16px;
+    }
+    #lightbox-prev:hover, #lightbox-next:hover { opacity: 0.9; }
+    #lightbox-prev { left: 12px; }
+    #lightbox-next { right: 12px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      header { padding: 32px 20px 20px; flex-direction: column; gap: 6px; }
+      .roll-header { padding: 0 20px 10px; }
+      .filmstrip { padding: 0 20px; }
+      .filmstrip-outer::before,
+      .filmstrip-outer::after { width: 30px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .frame img { transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Film Archive</h1>
+  <span class="tagline">35mm · Analog</span>
+</header>
+
+<div id="status">Loading rolls…</div>
+<div id="archive"></div>
+
+<!-- Lightbox -->
+<div id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
+  <button id="lightbox-close" aria-label="Close">✕</button>
+  <button id="lightbox-prev" aria-label="Previous">‹</button>
+  <img id="lightbox-img" src="" alt="" />
+  <div id="lightbox-meta"></div>
+  <button id="lightbox-next" aria-label="Next">›</button>
+</div>
+
+<script>
+  // ─── Config ─────────────────────────────────────────────────────────────────
+  const MANIFEST = 'manifest.json';  // path relative to this page
+  const FRAME_HEIGHT = 240;          // px — image area height
+  const FRAME_WIDTH  = 320;          // px — image area width
+
+  // How many sprocket holes per frame (visual, approx)
+  const HOLES_PER_FRAME = 2;
+
+  // ─── State ──────────────────────────────────────────────────────────────────
+  let lightboxFrames = [];  // [{src, roll, index}]
+  let lightboxIdx    = 0;
+
+  // ─── DOM refs ───────────────────────────────────────────────────────────────
+  const archive     = document.getElementById('archive');
+  const status      = document.getElementById('status');
+  const lightbox    = document.getElementById('lightbox');
+  const lbImg       = document.getElementById('lightbox-img');
+  const lbMeta      = document.getElementById('lightbox-meta');
+  const lbClose     = document.getElementById('lightbox-close');
+  const lbPrev      = document.getElementById('lightbox-prev');
+  const lbNext      = document.getElementById('lightbox-next');
+
+  // ─── Lightbox logic ─────────────────────────────────────────────────────────
+  function openLightbox(frames, idx) {
+    lightboxFrames = frames;
+    lightboxIdx    = idx;
+    showLightboxFrame();
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function showLightboxFrame() {
+    const f = lightboxFrames[lightboxIdx];
+    lbImg.src = f.src;
+    lbImg.alt = `${f.roll} — frame ${f.index + 1}`;
+    lbMeta.textContent = `${f.roll.toUpperCase()}  ·  ${String(f.index + 1).padStart(2,'0')} / ${String(lightboxFrames.length).padStart(2,'0')}`;
+  }
+  function stepLightbox(dir) {
+    lightboxIdx = (lightboxIdx + dir + lightboxFrames.length) % lightboxFrames.length;
+    showLightboxFrame();
+  }
+
+  lbClose.addEventListener('click', closeLightbox);
+  lbPrev.addEventListener('click', () => stepLightbox(-1));
+  lbNext.addEventListener('click', () => stepLightbox(1));
+  lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+  document.addEventListener('keydown', e => {
+    if (!lightbox.classList.contains('open')) return;
+    if (e.key === 'Escape')      closeLightbox();
+    if (e.key === 'ArrowLeft')   stepLightbox(-1);
+    if (e.key === 'ArrowRight')  stepLightbox(1);
+  });
+
+  // ─── Build sprocket rail ─────────────────────────────────────────────────────
+  function makeSprocketRail(frameCount, pos) {
+    const rail = document.createElement('div');
+    rail.className = `sprocket-rail ${pos}`;
+    const totalHoles = frameCount * HOLES_PER_FRAME;
+    const holeSpacing = Math.round(FRAME_WIDTH / HOLES_PER_FRAME);
+
+    for (let i = 0; i < totalHoles; i++) {
+      const hole = document.createElement('div');
+      hole.className = 'sprocket-hole';
+      hole.style.marginLeft  = i === 0 ? '10px' : `${holeSpacing - 14 - 1}px`; // 14=hole-size, 1=border
+      rail.appendChild(hole);
+    }
+    return rail;
+  }
+
+  // ─── Drag-to-scroll ──────────────────────────────────────────────────────────
+  function enableDragScroll(el) {
+    let isDown = false, startX, scrollLeft;
+    el.addEventListener('mousedown', e => {
+      isDown = true; el.classList.add('grabbing');
+      startX = e.pageX - el.offsetLeft; scrollLeft = el.scrollLeft;
+    });
+    document.addEventListener('mouseup', () => { isDown = false; el.classList.remove('grabbing'); });
+    el.addEventListener('mousemove', e => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - el.offsetLeft;
+      el.scrollLeft = scrollLeft - (x - startX);
+    });
+  }
+
+  // ─── Build a roll ────────────────────────────────────────────────────────────
+  function buildRoll(roll, rollIndex) {
+    const section = document.createElement('section');
+    section.className = 'roll';
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'roll-header';
+    header.innerHTML = `
+      <span class="roll-number">Roll ${String(rollIndex + 1).padStart(2,'0')}</span>
+      <span class="roll-title">${roll.title || roll.id}</span>
+      <span class="roll-count">${roll.frames.length} frames</span>
+    `;
+
+    // Build per-frame metadata for lightbox
+    const frames = roll.frames.map((src, i) => ({ src, roll: roll.title || roll.id, index: i }));
+
+    // Filmstrip outer (for fade edges)
+    const outer = document.createElement('div');
+    outer.className = 'filmstrip-outer';
+
+    // Filmstrip scroll track
+    const strip = document.createElement('div');
+    strip.className = 'filmstrip';
+    strip.setAttribute('aria-label', `${roll.title || roll.id} filmstrip`);
+    enableDragScroll(strip);
+
+    // Build each frame wrapper
+    roll.frames.forEach((src, i) => {
+      const fw = document.createElement('div');
+      fw.className = 'frame-wrapper';
+
+      // Top sprocket rail (once per strip — but we need it per-frame width for accuracy;
+      // simplest approach: each frame has its own mini rail columns)
+      const topRail = document.createElement('div');
+      topRail.className = 'sprocket-rail top';
+      for (let h = 0; h < HOLES_PER_FRAME; h++) {
+        const hole = document.createElement('div');
+        hole.className = 'sprocket-hole';
+        hole.style.margin = '0 auto';
+        topRail.style.justifyContent = 'space-evenly';
+        topRail.appendChild(hole);
+      }
+      topRail.style.width = FRAME_WIDTH + 'px';
+
+      // Image frame
+      const frame = document.createElement('div');
+      frame.className = 'frame';
+      frame.style.width  = FRAME_WIDTH + 'px';
+      frame.style.height = FRAME_HEIGHT + 'px';
+      frame.style.cursor = 'pointer';
+
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = `${roll.title || roll.id} — frame ${i + 1}`;
+      img.loading = 'lazy';
+
+      const numLabel = document.createElement('span');
+      numLabel.className = 'frame-num';
+      numLabel.textContent = String(i + 1).padStart(2,'0');
+
+      frame.appendChild(img);
+      frame.appendChild(numLabel);
+      frame.addEventListener('click', () => openLightbox(frames, i));
+
+      // Bottom sprocket rail
+      const botRail = document.createElement('div');
+      botRail.className = 'sprocket-rail bottom';
+      botRail.style.justifyContent = 'space-evenly';
+      botRail.style.width = FRAME_WIDTH + 'px';
+      for (let h = 0; h < HOLES_PER_FRAME; h++) {
+        const hole = document.createElement('div');
+        hole.className = 'sprocket-hole';
+        botRail.appendChild(hole);
+      }
+
+      fw.appendChild(topRail);
+      fw.appendChild(frame);
+      fw.appendChild(botRail);
+      strip.appendChild(fw);
+    });
+
+    outer.appendChild(strip);
+    section.appendChild(header);
+    section.appendChild(outer);
+    return section;
+  }
+
+  // ─── Main: load manifest ─────────────────────────────────────────────────────
+  async function init() {
+    let manifest;
+    try {
+      const res = await fetch(MANIFEST);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      manifest = await res.json();
+    } catch (err) {
+      status.textContent = `Could not load manifest.json — ${err.message}`;
+      return;
+    }
+
+    if (!manifest.rolls || manifest.rolls.length === 0) {
+      status.textContent = 'No rolls found in manifest.json.';
+      return;
+    }
+
+    status.remove();
+
+    manifest.rolls.forEach((roll, i) => {
+      archive.appendChild(buildRoll(roll, i));
+    });
+  }
+
+  init();
+</script>
+</body>
+</html>
