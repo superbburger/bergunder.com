@@ -67,11 +67,10 @@
       border-bottom: 1px solid #e0e0e0;
       margin-bottom: 0;
     }
-    .roll-number {
+    .roll-date {
       font-size: 0.65rem;
       color: var(--muted);
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
+      letter-spacing: 0.08em;
     }
     .roll-title {
       font-size: 0.75rem;
@@ -309,16 +308,41 @@
     });
   }
 
+  // ── Date formatting ───────────────────────────────────────────────────────
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  function formatDate(yyyymmdd) {
+    const y = yyyymmdd.slice(0, 4);
+    const m = parseInt(yyyymmdd.slice(4, 6), 10) - 1;
+    const d = parseInt(yyyymmdd.slice(6, 8), 10);
+    return `${MONTHS[m]} ${d}, ${y}`;
+  }
+
+  function formatDateRange(start, end) {
+    if (!start) return null;
+    if (start === end) return formatDate(start);
+    const ds = formatDate(start);
+    const de = formatDate(end);
+    // If same year, drop the year from the start date
+    if (start.slice(0, 4) === end.slice(0, 4)) {
+      const shortStart = ds.replace(/, \d{4}$/, '');
+      return `${shortStart} – ${de}`;
+    }
+    return `${ds} – ${de}`;
+  }
+
   // ── Build roll ────────────────────────────────────────────────────────────
   function buildRoll(roll, rollIndex) {
     const section = document.createElement('section');
     section.className = 'roll';
 
+    const dateStr = formatDateRange(roll.date_start, roll.date_end);
+
     const header = document.createElement('div');
     header.className = 'roll-header';
     header.innerHTML = `
-      <span class="roll-number">roll ${String(rollIndex + 1).padStart(2,'0')}</span>
       <span class="roll-title">${roll.title || roll.id}</span>
+      ${dateStr ? `<span class="roll-date">${dateStr}</span>` : ''}
       <span class="roll-count">${roll.frames.length} frames</span>
     `;
 
