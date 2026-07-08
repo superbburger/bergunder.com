@@ -273,7 +273,7 @@
   }
   function showFrame() {
     const f = lightboxFrames[lightboxIdx];
-    lbImg.src = f.src;
+    lbImg.src = f.src;        // ← full-res original for lightbox
     lbImg.alt = `${f.roll} — frame ${f.index + 1}`;
     lbMeta.textContent =
       `${f.roll}  ·  ${String(f.index + 1).padStart(2,'0')} / ${String(lightboxFrames.length).padStart(2,'0')}`;
@@ -322,7 +322,12 @@
       <span class="roll-count">${roll.frames.length} frames</span>
     `;
 
-    const frames = roll.frames.map((src, i) => ({ src, roll: roll.title || roll.id, index: i }));
+    const frames = roll.frames.map((f, i) => ({
+      src:   f.src   ?? f,   // support legacy string format
+      thumb: f.thumb ?? f.src ?? f,
+      roll:  roll.title || roll.id,
+      index: i
+    }));
 
     const outer = document.createElement('div');
     outer.className = 'carousel-outer';
@@ -332,14 +337,14 @@
     track.setAttribute('aria-label', `${roll.title || roll.id}`);
     enableDragScroll(track);
 
-    roll.frames.forEach((src, i) => {
+    frames.forEach((f, i) => {
       const frame = document.createElement('div');
       frame.className = 'frame';
       frame.style.width  = FRAME_WIDTH + 'px';
       frame.style.height = FRAME_HEIGHT + 'px';
 
       const img = document.createElement('img');
-      img.src = src;
+      img.src = f.thumb;     // ← thumbnail for carousel
       img.alt = `Frame ${i + 1}`;
       img.loading = 'lazy';
 
@@ -351,6 +356,7 @@
       frame.appendChild(num);
       frame.addEventListener('click', () => openLightbox(frames, i));
       track.appendChild(frame);
+
     });
 
     outer.appendChild(track);
