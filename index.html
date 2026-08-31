@@ -12,15 +12,36 @@
   <body>
     <div class="heading">
       <div><h2>Aaron Bergunder</h2></div>
+      <div class="zoom-controls" id="zoomControls" aria-label="Grid zoom">
+        <button class="zoom-btn" data-cols="1" title="1 wide">1</button>
+        <button class="zoom-btn" data-cols="2" title="2 wide">2</button>
+        <button class="zoom-btn" data-cols="3" title="3 wide">3</button>
+        <button class="zoom-btn" data-cols="4" title="4 wide">4</button>
+      </div>
       <div><span id="headingPhrase">.</span></div>
     </div>
-    <div class="container" id="container">
-      <div class="intro">
-        <h1>An incomplete archive of modern works</h1>
-        <p></p>
-      </div>
-    </div>
-    <!-- end container-->
+
+    <main id="app">
+      <section id="gridView">
+        <div class="container" id="container">
+          <div class="intro">
+            <h1>An incomplete archive of modern works</h1>
+            <p></p>
+          </div>
+        </div>
+        <!-- end container-->
+      </section>
+
+      <section id="detailView" hidden>
+        <a href="#" class="btn back-link" id="backLink">&larr; All works</a>
+        <div id="detailContent"></div>
+        <nav class="detail-nav">
+          <a href="#" id="prevLink">&larr; Previous</a>
+          <a href="#" id="nextLink">Next &rarr;</a>
+        </nav>
+      </section>
+    </main>
+
     <script src="script.js" type="text/javascript"></script>
   </body>
 </html>

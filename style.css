@@ -133,12 +133,41 @@ p.small,
   line-height: 2rem;
   letter-spacing: -0.02em;
 }
+
+/* zoom controls, sitting between the name and the phrase */
+.zoom-controls {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+.zoom-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--primary);
+  opacity: 0.45;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+.zoom-btn:hover {
+  opacity: 0.8;
+}
+.zoom-btn.active {
+  color: var(--accent-500);
+  opacity: 1;
+}
+
 .container {
-  padding: 4rem 0 0 0;
+  --cols: 2;
+  padding: 4rem 12px 4rem;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(var(--cols), 1fr);
   align-items: start;
-  gap: 2rem;
+  gap: 2.5rem 1.5rem;
 }
 .intro {
   color: var(--primary);
@@ -151,6 +180,97 @@ p.small,
 .intro p,
 .intro h1 {
   max-width: 40ch;
+}
+
+/*
+*
+* GRID TILES *
+*
+*/
+.tile {
+  display: block;
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.75s ease-out;
+}
+.tile.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.tile-image-container {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background-color: #f2f2f2;
+}
+.tile-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+.tile:hover .tile-image-container img {
+  transform: scale(1.04);
+}
+.tile-title {
+  padding-top: 0.6rem;
+  font-size: 0.9rem;
+  line-height: 1.2rem;
+  color: var(--primary);
+}
+.tile:hover .tile-title {
+  color: var(--accent-500);
+}
+
+@media screen and (max-width: 960px) {
+  .container {
+    --cols: min(var(--cols), 2);
+  }
+  .intro {
+    grid-template-columns: 1fr;
+  }
+}
+@media screen and (max-width: 560px) {
+  .container {
+    --cols: 1;
+  }
+}
+
+/*
+*
+* FULL-PAGE DETAIL VIEW *
+*
+*/
+#detailView {
+  padding: 4rem 0 4rem;
+}
+.back-link {
+  margin: 0 12px 1rem;
+}
+.detail-nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 12px;
+  margin-top: 2rem;
+  border-top: solid 1px #333;
+}
+.detail-nav a {
+  font-size: 0.9rem;
+}
+
+/* the detail item reuses .item's internal layout, just full-width and always visible */
+.detail-item {
+  grid-column: unset;
+  border-top: none;
+  margin-bottom: 0;
+  padding: 0 12px;
+  opacity: 1 !important;
+  transform: none !important;
+}
+.detail-item .info {
+  padding-top: 0;
 }
 
 .item {
@@ -189,9 +309,6 @@ img.image {
 
 @media screen and (max-width: 960px) {
   .item {
-    grid-template-columns: 1fr;
-  }
-  .intro {
     grid-template-columns: 1fr;
   }
   div.info {
@@ -300,7 +417,7 @@ img.image {
   display: inline-flex;
   border: solid 1px currentColor;
   border-radius: 3rem;
-  padding: 0.5rem;
+  padding: 0.5rem 1rem;
   width: auto;
   text-align: center;
   align-content: center;
