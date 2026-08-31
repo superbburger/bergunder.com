@@ -4,6 +4,7 @@
   --accent-500: #e04908;
   --neutral-100: #fcf4f1;
   --primary: #333333;
+  --link: #1a4b5b;
 }
 
 html {
@@ -50,7 +51,7 @@ a:active {
 
 h1 {
   font-size: 4rem;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 4rem;
   padding: 0;
   margin: 0;
@@ -127,10 +128,10 @@ p.small,
   flex-shrink: 0;
 }
 .heading-name {
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 400;
   line-height: 2rem;
-  letter-spacing: -0.02em;
+  text-transform: uppercase;
 }
 .heading-phrase {
   font-weight: 400;
@@ -185,7 +186,7 @@ p.small,
   grid-column: 1 / -1;
   padding: 12px;
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 2fr 1fr;
   align-items: baseline;
 }
 .intro p,
@@ -227,11 +228,12 @@ p.small,
   opacity: 1;
 }
 .tile-title {
-  padding-top: 0.6rem;
-  font-size: 1rem;
+  padding-top: 0.25rem;
+  font-size: 0.75rem;
   line-height: 1.25rem;
   color: var(--primary);
-  font-weight: 600;
+  font-weight: 400;
+  text-transform: uppercase;
 }
 .tile:hover .tile-title {
   color: var(--accent-500);
@@ -366,14 +368,13 @@ img.image {
 
 .item .title {
   color: var(--primary);
-  padding: 8px 12px;
+  padding: 8px 0;
   width: fit-content;
 }
 .item .project {
-  margin: 8px 12px;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
   color: var(--primary);
-  padding: 0.5rem;
-  border: 1px solid var(--primary);
   border-radius: 0.25rem;
   justify-self: start;
 }
@@ -384,20 +385,26 @@ img.image {
 
 .item .date {
   grid-area: releaseDate;
-  padding: 0 12px;
   justify-self: start;
+  font-weight: 500;
+  text-transform: uppercase;
 }
 .item .date a {
-  background-color: var(--primary);
-  color: #fff;
-  padding: 0.5rem;
-  border-radius: 4rem;
+  color: var(--link);
+}
+.item .date a::after {
+  content: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="12" y1="19" x2="12" y2="5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /><polyline points="6,11 12,5 18,11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /> </svg>');
+  display: inline-block;
+  position: relative;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  transform: rotate(45deg);
 }
 
 .item .description,
 .item .credits {
   grid-area: description;
-  padding: 12px;
   display: flex;
   justify-content: end;
   align-items: end;

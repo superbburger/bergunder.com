@@ -4,7 +4,7 @@ let itemSlugs = [];
 const SITE_TITLE = "Aaron Bergunder";
 
 // Logical zoom levels (columns), smallest (most zoomed in) to largest.
-const ZOOM_LEVELS = [1, 2, 4];
+const ZOOM_LEVELS = [1, 3, 5];
 const DEFAULT_ZOOM_INDEX = 1; // corresponds to 2 columns
 let zoomIndex = DEFAULT_ZOOM_INDEX;
 const mobileZoomCap = window.matchMedia("(max-width: 639px)");
@@ -72,7 +72,7 @@ function observeTiles() {
         }
       });
     },
-    { threshold: 0.1 }
+    { threshold: 0.1 },
   );
   tiles.forEach((tile) => observer.observe(tile));
 }
@@ -85,7 +85,9 @@ function applyZoom() {
     ? Math.min(desiredCols, 2)
     : desiredCols;
 
-  document.getElementById("container").style.setProperty("--cols", effectiveCols);
+  document
+    .getElementById("container")
+    .style.setProperty("--cols", effectiveCols);
 
   document.getElementById("zoomInBtn").disabled = zoomIndex === 0;
   document.getElementById("zoomOutBtn").disabled =
