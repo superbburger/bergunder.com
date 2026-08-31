@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moving Cost Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16233D;
+    --ink-soft:#233752;
+    --paper:#F2EFE6;
+    --paper-line:#D9D3C3;
+    --card:#FBFAF6;
+    --blue:#3D5A80;
+    --blue-soft:#7A93AD;
+    --brass:#B8823D;
+    --brass-soft:#E4C79A;
+    --good:#3F7855;
+    --bad:#B5493D;
+    --text:#1B1F27;
+    --text-mute:#5B6472;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ink);
+    background-image:
+      linear-gradient(var(--ink-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--ink-soft) 1px, transparent 1px);
+    background-size:34px 34px;
+    background-position:-1px -1px;
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    padding:40px 18px 80px;
+  }
+  .sheet{
+    max-width:920px;
+    margin:0 auto;
+    background:var(--paper);
+    border:1px solid var(--paper-line);
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.5);
+  }
+  /* Title block, drafting-table style */
+  .titleblock{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    padding:30px 34px 20px;
+    border-bottom:2px solid var(--ink);
+    gap:20px;
+    flex-wrap:wrap;
+  }
+  .titleblock h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(28px,4vw,40px);
+    margin:0 0 6px;
+    letter-spacing:-0.01em;
+    color:var(--ink);
+  }
+  .titleblock p{
+    margin:0;
+    color:var(--text-mute);
+    font-size:14.5px;
+    max-width:46ch;
+    line-height:1.5;
+  }
+  .stamp{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--blue);
+    border:1px solid var(--blue-soft);
+    padding:8px 12px;
+    text-align:right;
+    line-height:1.7;
+    white-space:nowrap;
+  }
+  .stamp span{color:var(--text-mute);}
+
+  main{padding:8px 34px 10px;}
+
+  /* Section dividers, dimension-line style */
+  .divider{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:38px 0 18px;
+  }
+  .divider::before, .divider::after{
+    content:'';
+    flex:1;
+    height:1px;
+    background:repeating-linear-gradient(90deg, var(--blue-soft) 0 6px, transparent 6px 10px);
+  }
+  .divider .tick{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--blue);
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    white-space:nowrap;
+  }
+
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    margin-bottom:4px;
+  }
+  .section-head .num{
+    font-family:'IBM Plex Mono',monospace;
+    color:var(--brass);
+    font-size:13px;
+  }
+  .section-head h2{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:22px;
+    margin:0;
+    color:var(--ink);
+  }
+  .section-sub{
+    color:var(--text-mute);
+    font-size:13.5px;
+    margin:0 0 18px;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px 18px;
+  }
+  @media(max-width:600px){ .grid{grid-template-columns:1fr;} }
+
+  .field label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-bottom:5px;
+    letter-spacing:0.01em;
+  }
+  .field .hint{
+    display:block;
+    font-weight:400;
+    color:var(--text-mute);
+    font-size:11.5px;
+    margin-top:1px;
+  }
+  .input-wrap{
+    position:relative;
+    display:flex;
+    align-items:center;
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    transition:border-color .15s;
+  }
+  .input-wrap:focus-within{
+    border-color:var(--blue);
+  }
+  .input-wrap .prefix, .input-wrap .suffix{
+    font-family:'IBM Plex Mono',monospace;
+    color:var(--text-mute);
+    font-size:14px;
+    padding:0 4px;
+  }
+  .input-wrap .prefix{padding-left:12px;}
+  .input-wrap .suffix{padding-right:12px;}
+  .input-wrap input{
+    flex:1;
+    min-width:0;
+    border:0;
+    outline:0;
+    background:transparent;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:15px;
+    padding:11px 8px;
+    color:var(--text);
+  }
+
+  details.advanced{
+    margin-top:30px;
+    border-top:1px solid var(--paper-line);
+    padding-top:14px;
+  }
+  details.advanced summary{
+    cursor:pointer;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--blue);
+    list-style:none;
+  }
+  details.advanced summary::-webkit-details-marker{display:none;}
+  details.advanced summary::before{content:'▸ '; }
+  details.advanced[open] summary::before{content:'▾ ';}
+  details.advanced .grid{margin-top:18px;}
+  details.advanced .section-sub{margin-top:2px;}
+
+  /* Results */
+  .results-card{
+    background:var(--ink);
+    color:var(--paper);
+    padding:26px 28px;
+    margin-top:6px;
+  }
+  .results-card h2{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:20px;
+    margin:0 0 2px;
+    color:var(--brass-soft);
+  }
+  .results-card .section-sub{color:#AEB9C9;}
+
+  .ledger{width:100%;border-collapse:collapse;margin-top:10px;}
+  .ledger tr{border-bottom:1px dashed rgba(255,255,255,0.18);}
+  .ledger tr:last-child{border-bottom:none;}
+  .ledger td{padding:9px 0;font-size:14.5px;}
+  .ledger td.label{color:#C7CEDB;}
+  .ledger td.val{
+    font-family:'IBM Plex Mono',monospace;
+    text-align:right;
+    font-size:15px;
+    white-space:nowrap;
+  }
+  .ledger tr.total td{
+    padding-top:13px;
+    font-weight:600;
+    color:#fff;
+    border-top:1px solid rgba(255,255,255,0.35);
+    border-bottom:none;
+  }
+  .ledger tr.total td.val{font-size:18px;}
+
+  .results-flex{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:22px;
+    margin-top:22px;
+  }
+  @media(max-width:600px){ .results-flex{grid-template-columns:1fr;} }
+
+  .delta-banner{
+    margin-top:22px;
+    padding:18px 22px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:14px;
+    flex-wrap:wrap;
+    border:1px solid;
+  }
+  .delta-banner.good{border-color:var(--good); background:rgba(63,120,85,0.12);}
+  .delta-banner.bad{border-color:var(--bad); background:rgba(181,73,61,0.12);}
+  .delta-banner .dtext{font-size:13.5px;color:#D8DEE9;}
+  .delta-banner .dval{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:26px;
+    font-weight:600;
+  }
+  .delta-banner.good .dval{color:#7FCC9A;}
+  .delta-banner.bad .dval{color:#E58C7F;}
+
+  footer{
+    padding:22px 34px 30px;
+    font-size:12px;
+    color:var(--text-mute);
+    border-top:1px solid var(--paper-line);
+    margin-top:20px;
+    line-height:1.6;
+  }
+  footer code{
+    font-family:'IBM Plex Mono',monospace;
+    background:rgba(0,0,0,0.05);
+    padding:1px 4px;
+  }
+
+  .roofline{display:block;margin:0 auto;opacity:0.5;}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="titleblock">
+    <div>
+      <h1>Moving Cost Calculator</h1>
+      <p>Sell your current home, buy the next one — see your walk-away cash, the mortgage you'll need, and how your monthly costs shift.</p>
+    </div>
+    <div class="stamp">
+      DWG&nbsp; MOVE&#8209;01<br>
+      <span>REGION</span>&nbsp; BC, CANADA<br>
+      <span>UNITS</span>&nbsp; CAD $
+    </div>
+  </div>
+
+  <main>
+
+    <!-- SALE -->
+    <div class="divider"><span class="tick">01 · Selling</span></div>
+    <div class="section-head"><span class="num">§1</span><h2>Your current home</h2></div>
+    <p class="section-sub">What you expect to sell for, and what you still owe on it.</p>
+    <div class="grid">
+      <div class="field">
+        <label for="sellPrice">Sale price<span class="hint">Expected sale price</span></label>
+        <div class="input-wrap"><span class="prefix">$</span><input type="number" id="sellPrice" value="600000" step="1000"></div>
+      </div>
+      <div class="field">
+        <label for="origMortgage">Remaining mortgage balance<span class="hint">Payout owed at sale (reference only)</span></label>
+        <div class="input-wrap"><span class="prefix">$</span><input type="number" id="origMortgage" value="182000" step="1000"></div>
+      </div>
+    </div>
+
+    <!-- PURCHASE -->
+    <div class="divider"><span class="tick">02 · Buying</span></div>
+    <div class="section-head"><span class="num">§2</span><h2>Your new home</h2></div>
+    <p class="section-sub">The purchase price, financing rate, and any closing-cost extras.</p>
+    <div class="grid">
+      <div class="field">
+        <label for="newPrice">Purchase price</label>
+        <div class="input-wrap"><span class="prefix">$</span><input type="number" id="newPrice" value="800000" step="1000"></div>
+      </div>
+      <div class="field">
+        <label for="rate">Mortgage interest rate<span class="hint">Annual rate</span></label>
+        <div class="input-wrap"><input type="number" id="rate" value="4.44" step="0.01"><span class="suffix">%</span></div>
+      </div>
+      <div class="field">
+        <label for="misc">Misc. closing costs<span class="hint">Inspection, legal, moving, etc.</span></label>
+        <div class="input-wrap"><span class="prefix">$</span><input type="number" id="misc" value="24000" step="500"></div>
+      </div>
+      <div class="field">
+        <label for="flatFee">Flat legal / admin fee<span class="hint">Applied on both sides of the sale commission</span></label>
+        <div class="input-wrap"><span class="prefix">$</span><input type="number" id="flatFee" value="3000" step="100"></div>
+      </div>
+    </div>
+
+    <!-- MONTHLY COSTS -->
+    <div class="divider"><span class="tick">03 · Monthly costs</span></div>
+    <div class="section-head"><span class="num">§3</span><h2>Old vs. new monthly costs</h2></div>
+    <p class="section-sub">Current carrying costs, and what the new home adds or replaces.</p>
+    <div class="grid">
+      <div class="field">
+        <label for="currentPayment">Current mortgage payment<span class="hint">Monthly, on the home you're selling</span></label>
+        <div class="input-wrap"><span class="prefix">$</span><input type="number" id="currentPayment" value="1526.64" step="10"></div>
+      </div>
+      <div class="field">
+        <label for="extra">Extra monthly payment<span class="hint">e.g. line of credit / second mortgage</span></label>
+        <div class="input-wrap"><span class="prefix">$</span><input type="number" id="extra" value="473.36" step="10"></div>
+      </div>
+      <div class="field">
+        <label for="oldStrata">Current strata / HOA fee<span class="hint">Monthly</span></label>
+        <div class="input-wrap"><span class="prefix">$</span><input type="number" id="oldStrata" value="555.90" step="10"></div>
+      </div>
+      <div class="field">
+        <label for="oldTax">Current property tax<span class="hint">Monthly</span></label>
+        <div class="input-wrap"><span class="prefix">$</span><input type="number" id="oldTax" value="277" step="10"></div>
+      </div>
+      <div class="field">
+        <label for="newStrata">New strata / HOA fee<span class="hint">Monthly</span></label>
+        <div class="input-wrap"><span class="prefix">$</span><input type="number" id="newStrata" value="0" step="10"></div>
+      </div>
+      <div class="field">
+        <label for="newTax">New property tax<span class="hint">Annual, before homeowner grant</span></label>
+        <div class="input-wrap"><span class="prefix">$</span><input type="number" id="newTax" value="4000" step="100"></div>
+      </div>
+    </div>
+
+    <details class="advanced">
+      <summary>Advanced &mdash; commission & tax assumptions</summary>
+      <p class="section-sub">Defaults reflect typical BC listing-side / buyer-side commission tiers, 5% GST, BC Property Transfer Tax, and the $570 homeowner grant. Change only if your deal differs.</p>
+      <div class="grid">
+        <div class="field">
+          <label for="sellCommRate">Listing‑side commission rate<span class="hint">On the portion of sale price over the threshold</span></label>
+          <div class="input-wrap"><input type="number" id="sellCommRate" value="2" step="0.1"><span class="suffix">%</span></div>
+        </div>
+        <div class="field">
+          <label for="buyCommRate">Buyer‑side commission rate<span class="hint">On the portion of sale price over the threshold</span></label>
+          <div class="input-wrap"><input type="number" id="buyCommRate" value="1.5" step="0.1"><span class="suffix">%</span></div>
+        </div>
+        <div class="field">
+          <label for="commThreshold">Commission tier threshold</label>
+          <div class="input-wrap"><span class="prefix">$</span><input type="number" id="commThreshold" value="100000" step="1000"></div>
+        </div>
+        <div class="field">
+          <label for="commDiscount">Listing‑side discount<span class="hint">Reduction applied before GST</span></label>
+          <div class="input-wrap"><input type="number" id="commDiscount" value="25" step="1"><span class="suffix">%</span></div>
+        </div>
+        <div class="field">
+          <label for="gst">GST on commission</label>
+          <div class="input-wrap"><input type="number" id="gst" value="5" step="0.1"><span class="suffix">%</span></div>
+        </div>
+        <div class="field">
+          <label for="pttRate">Property Transfer Tax rate<span class="hint">On the portion of price over the threshold</span></label>
+          <div class="input-wrap"><input type="number" id="pttRate" value="2" step="0.1"><span class="suffix">%</span></div>
+        </div>
+        <div class="field">
+          <label for="pttThreshold">PTT threshold</label>
+          <div class="input-wrap"><span class="prefix">$</span><input type="number" id="pttThreshold" value="200000" step="1000"></div>
+        </div>
+        <div class="field">
+          <label for="pttBase">PTT base amount<span class="hint">Tax on the portion below the threshold</span></label>
+          <div class="input-wrap"><span class="prefix">$</span><input type="number" id="pttBase" value="2000" step="100"></div>
+        </div>
+        <div class="field">
+          <label for="taxCredit">Homeowner grant credit<span class="hint">Annual, deducted before monthly tax is spread</span></label>
+          <div class="input-wrap"><span class="prefix">$</span><input type="number" id="taxCredit" value="570" step="10"></div>
+        </div>
+        <div class="field">
+          <label for="amortYears">Amortization period</label>
+          <div class="input-wrap"><input type="number" id="amortYears" value="25" step="1"><span class="suffix">yrs</span></div>
+        </div>
+      </div>
+    </details>
+
+    <!-- RESULTS -->
+    <div class="divider"><span class="tick">Result</span></div>
+
+    <div class="results-flex">
+      <div class="results-card">
+        <h2>Sale proceeds</h2>
+        <p class="section-sub">What's left after commissions.</p>
+        <table class="ledger">
+          <tr><td class="label">Listing‑side commission (incl. GST)</td><td class="val" id="out-sellComm">–</td></tr>
+          <tr><td class="label">Buyer‑side commission (incl. GST)</td><td class="val" id="out-buyComm">–</td></tr>
+          <tr class="total"><td>Walk‑away cash</td><td class="val" id="out-walk">–</td></tr>
+        </table>
+      </div>
+
+      <div class="results-card">
+        <h2>New mortgage</h2>
+        <p class="section-sub">What buying the next home requires.</p>
+        <table class="ledger">
+          <tr><td class="label">Property Transfer Tax</td><td class="val" id="out-ptt">–</td></tr>
+          <tr><td class="label">Mortgage amount needed</td><td class="val" id="out-mortgageNeeded">–</td></tr>
+          <tr class="total"><td>New monthly payment</td><td class="val" id="out-newPayment">–</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="results-card" style="margin-top:22px;">
+      <h2>Monthly cost, old vs. new</h2>
+      <p class="section-sub">Total monthly housing cost before and after the move.</p>
+      <div class="results-flex">
+        <table class="ledger">
+          <tr><td class="label" colspan="2" style="color:#8F9BAF;font-size:12px;text-transform:uppercase;letter-spacing:.06em;">Current home</td></tr>
+          <tr><td class="label">Mortgage payment</td><td class="val" id="out-oldMortgageLine">–</td></tr>
+          <tr><td class="label">Extra payment</td><td class="val" id="out-extraLine">–</td></tr>
+          <tr><td class="label">Strata / HOA</td><td class="val" id="out-oldStrataLine">–</td></tr>
+          <tr><td class="label">Property tax</td><td class="val" id="out-oldTaxLine">–</td></tr>
+          <tr class="total"><td>Total / month</td><td class="val" id="out-oldTotal">–</td></tr>
+        </table>
+        <table class="ledger">
+          <tr><td class="label" colspan="2" style="color:#8F9BAF;font-size:12px;text-transform:uppercase;letter-spacing:.06em;">New home</td></tr>
+          <tr><td class="label">New mortgage payment</td><td class="val" id="out-newMortgageLine">–</td></tr>
+          <tr><td class="label">Old mortgage payment<span style="display:block;font-size:11px;color:#8F9BAF;">carried during overlap</span></td><td class="val" id="out-oldCarriedLine">–</td></tr>
+          <tr><td class="label">Strata / HOA</td><td class="val" id="out-newStrataLine">–</td></tr>
+          <tr><td class="label">Property tax</td><td class="val" id="out-newTaxLine">–</td></tr>
+          <tr class="total"><td>Total / month</td><td class="val" id="out-newTotal">–</td></tr>
+        </table>
+      </div>
+
+      <div class="delta-banner" id="delta-banner">
+        <div class="dtext" id="delta-text">Monthly cost change</div>
+        <div class="dval" id="delta-val">–</div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    Estimate only — not financial, legal, or tax advice. Commission, GST, and Property Transfer Tax figures use the assumptions in <strong>Advanced</strong> above; confirm exact figures with your realtor, lawyer, and lender before relying on them. Mortgage payment uses a standard amortizing‑loan formula, matching Excel's <code>PMT()</code>.
+  </footer>
+</div>
+
+<script>
+function fmt(n){
+  if (!isFinite(n)) n = 0;
+  return n.toLocaleString('en-CA', {style:'currency', currency:'CAD', maximumFractionDigits:0});
+}
+function fmt2(n){
+  if (!isFinite(n)) n = 0;
+  return n.toLocaleString('en-CA', {style:'currency', currency:'CAD', maximumFractionDigits:2});
+}
+function num(id){
+  const v = parseFloat(document.getElementById(id).value);
+  return isFinite(v) ? v : 0;
+}
+function pct(id){ return num(id) / 100; }
+
+function monthlyPayment(principal, annualRate, months){
+  const r = annualRate/12;
+  if (principal <= 0) return 0;
+  if (r === 0) return principal/months;
+  return principal * r * Math.pow(1+r, months) / (Math.pow(1+r, months) - 1);
+}
+
+function calculate(){
+  // --- core inputs ---
+  const sellPrice   = num('sellPrice');
+  const newPrice    = num('newPrice');
+  const rate        = pct('rate');
+  const misc        = num('misc');
+  const flatFee     = num('flatFee');
+
+  const currentPayment = num('currentPayment');
+  const extra       = num('extra');
+  const oldStrata   = num('oldStrata');
+  const oldTax      = num('oldTax');
+  const newStrata   = num('newStrata');
+  const newTaxAnnual= num('newTax');
+
+  // --- advanced assumptions ---
+  const sellCommRate  = pct('sellCommRate');
+  const buyCommRate   = pct('buyCommRate');
+  const commThreshold = num('commThreshold');
+  const commDiscount  = pct('commDiscount');
+  const gst           = pct('gst');
+  const pttRate       = pct('pttRate');
+  const pttThreshold  = num('pttThreshold');
+  const pttBase       = num('pttBase');
+  const taxCredit     = num('taxCredit');
+  const amortMonths   = num('amortYears') * 12;
+
+  // --- Sale commissions (mirrors J/K columns) ---
+  const sellCommRaw = Math.max(sellPrice - commThreshold, 0) * sellCommRate;
+  const sellCommSubtotal = sellCommRaw + flatFee;
+  const sellCommDiscount = sellCommSubtotal * commDiscount;
+  const sellComm = (sellCommSubtotal - sellCommDiscount) * (1 + gst);   // D6
+
+  const buyCommRaw = Math.max(sellPrice - commThreshold, 0) * buyCommRate;
+  const buyComm = (buyCommRaw + flatFee) * (1 + gst);                  // D7
+
+  const walk = sellPrice - sellComm - buyComm;                         // D8
+
+  // --- Purchase side ---
+  const ptt = Math.max(newPrice - pttThreshold, 0) * pttRate + pttBase; // D12
+  const mortgageNeeded = newPrice - walk - ptt + misc;                  // D14
+  const newPayment = monthlyPayment(Math.max(mortgageNeeded,0), rate, amortMonths); // D19
+
+  // --- Monthly cost comparison ---
+  const oldTotal = currentPayment + extra + oldStrata + oldTax;         // H28
+  const newTaxMonthly = (newTaxAnnual - taxCredit) / 12;                // K27
+  const newTotal = newPayment + currentPayment + newStrata + newTaxMonthly; // K28
+  const delta = newTotal - oldTotal;                                    // H30
+
+  // --- render ---
+  document.getElementById('out-sellComm').textContent = fmt(sellComm);
+  document.getElementById('out-buyComm').textContent = fmt(buyComm);
+  document.getElementById('out-walk').textContent = fmt(walk);
+
+  document.getElementById('out-ptt').textContent = fmt(ptt);
+  document.getElementById('out-mortgageNeeded').textContent = fmt(mortgageNeeded);
+  document.getElementById('out-newPayment').textContent = fmt2(newPayment);
+
+  document.getElementById('out-oldMortgageLine').textContent = fmt2(currentPayment);
+  document.getElementById('out-extraLine').textContent = fmt2(extra);
+  document.getElementById('out-oldStrataLine').textContent = fmt2(oldStrata);
+  document.getElementById('out-oldTaxLine').textContent = fmt2(oldTax);
+  document.getElementById('out-oldTotal').textContent = fmt2(oldTotal);
+
+  document.getElementById('out-newMortgageLine').textContent = fmt2(newPayment);
+  document.getElementById('out-oldCarriedLine').textContent = fmt2(currentPayment);
+  document.getElementById('out-newStrataLine').textContent = fmt2(newStrata);
+  document.getElementById('out-newTaxLine').textContent = fmt2(newTaxMonthly);
+  document.getElementById('out-newTotal').textContent = fmt2(newTotal);
+
+  const banner = document.getElementById('delta-banner');
+  const dtext = document.getElementById('delta-text');
+  const dval = document.getElementById('delta-val');
+  banner.classList.remove('good','bad');
+  if (delta >= 0){
+    banner.classList.add('bad');
+    dtext.textContent = 'Monthly cost increases by';
+    dval.textContent = '+' + fmt2(Math.abs(delta));
+  } else {
+    banner.classList.add('good');
+    dtext.textContent = 'Monthly cost decreases by';
+    dval.textContent = '−' + fmt2(Math.abs(delta));
+  }
+}
+
+document.querySelectorAll('input').forEach(el => el.addEventListener('input', calculate));
+calculate();
+</script>
+</body>
+</html>
