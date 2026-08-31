@@ -9,6 +9,7 @@
 html {
   font-size: 16px;
   font-family:
+    "Inter Tight",
     "Helvetica Neue",
     "Helvetica",
     -apple-system,
@@ -49,24 +50,22 @@ a:active {
 
 h1 {
   font-size: 4rem;
-  font-weight: 400;
-  line-height: 3.75rem;
+  font-weight: 600;
+  line-height: 4rem;
   padding: 0;
   margin: 0;
-  letter-spacing: -0.03em;
-  font-family: "Helvetica Neue", Helvetica, sans-serif, Arial;
+  font-family: "Inter Tight", "Helvetica Neue", Helvetica, sans-serif, Arial;
 }
 
 h2,
 .title {
   font-size: 2.5rem;
-  font-weight: 400;
-  line-height: 2.25rem;
+  font-weight: 600;
+  line-height: 2.5rem;
   padding: 0;
   margin: 0;
   vertical-align: baseline;
-  letter-spacing: -0.03em;
-  font-family: "Helvetica Neue", Helvetica, sans-serif, Arial;
+  font-family: "Inter Tight", "Helvetica Neue", Helvetica, sans-serif, Arial;
 }
 
 h3 {
@@ -75,7 +74,6 @@ h3 {
   line-height: 2rem;
   padding: 0;
   margin: 0;
-  letter-spacing: -0.01em;
   text-transform: uppercase;
 }
 h4,
@@ -108,57 +106,70 @@ p.small,
 *
 */
 .heading {
-  top: 12px;
-  left: 12px;
+  top: 0;
+  left: 0;
   display: flex;
   position: fixed;
-  align-items: baseline;
+  align-items: center;
   gap: 12px;
   width: 100%;
-  max-width: calc(100vw - 36px);
+  padding: 12px 18px;
+  box-sizing: border-box;
   justify-content: space-between;
-  background-color: rgba(0, 0, 0, 0);
+  background-color: #fff;
   z-index: 100;
 }
 
-.heading h2 {
+.heading-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.heading-name {
   font-size: 1.25rem;
   font-weight: 600;
   line-height: 2rem;
   letter-spacing: -0.02em;
 }
-.heading span#headingPhrase {
-  font-size: 1.25rem;
-  font-weight: 600;
-  line-height: 2rem;
-  letter-spacing: -0.02em;
+.heading-phrase {
+  font-weight: 400;
+  opacity: 0.85;
+  margin-left: 2px;
 }
 
-/* zoom controls, sitting between the name and the phrase */
+/* zoom controls, upper right of the heading bar */
 .zoom-controls {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 2px;
+  flex-shrink: 0;
 }
 .zoom-btn {
   appearance: none;
   border: none;
   background: transparent;
   color: var(--primary);
-  opacity: 0.45;
-  font-family: inherit;
-  font-size: 1rem;
-  font-weight: 600;
   cursor: pointer;
-  padding: 4px 8px;
-  transition: opacity 0.15s ease, color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 4px;
+  transition:
+    opacity 0.15s ease,
+    background-color 0.15s ease;
 }
-.zoom-btn:hover {
-  opacity: 0.8;
+.zoom-btn svg {
+  display: block;
 }
-.zoom-btn.active {
-  color: var(--accent-500);
-  opacity: 1;
+.zoom-btn:hover:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+.zoom-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+  pointer-events: none;
 }
 
 .container {
@@ -209,34 +220,30 @@ p.small,
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.4s ease;
+  opacity: 0.95;
+  transition: opacity 0.25s ease;
 }
 .tile:hover .tile-image-container img {
-  transform: scale(1.04);
+  opacity: 1;
 }
 .tile-title {
   padding-top: 0.6rem;
-  font-size: 0.9rem;
-  line-height: 1.2rem;
+  font-size: 1rem;
+  line-height: 1.25rem;
   color: var(--primary);
+  font-weight: 600;
 }
 .tile:hover .tile-title {
   color: var(--accent-500);
 }
 
 @media screen and (max-width: 960px) {
-  .container {
-    --cols: min(var(--cols), 2);
-  }
   .intro {
     grid-template-columns: 1fr;
   }
 }
-@media screen and (max-width: 560px) {
-  .container {
-    --cols: 1;
-  }
-}
+/* Grid column cap below 640px is applied in script.js so it can respect
+   the user's chosen zoom level while still never exceeding 2 columns. */
 
 /*
 *
@@ -245,9 +252,6 @@ p.small,
 */
 #detailView {
   padding: 4rem 0 4rem;
-}
-.back-link {
-  margin: 0 12px 1rem;
 }
 .detail-nav {
   display: flex;

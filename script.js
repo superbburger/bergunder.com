@@ -2,7 +2,12 @@ let allItems = [];
 let itemSlugs = [];
 
 const SITE_TITLE = "Aaron Bergunder";
-const DEFAULT_COLS = "2";
+
+// Logical zoom levels (columns), smallest (most zoomed in) to largest.
+const ZOOM_LEVELS = [1, 2, 4];
+const DEFAULT_ZOOM_INDEX = 1; // corresponds to 2 columns
+let zoomIndex = DEFAULT_ZOOM_INDEX;
+const mobileZoomCap = window.matchMedia("(max-width: 639px)");
 
 /* -------------------- helpers -------------------- */
 
@@ -74,30 +79,58 @@ function observeTiles() {
 
 /* -------------------- zoom control -------------------- */
 
-function setZoom(cols) {
-  document.getElementById("container").style.setProperty("--cols", cols);
+function applyZoom() {
+  const desiredCols = ZOOM_LEVELS[zoomIndex];
+  const effectiveCols = mobileZoomCap.matches
+    ? Math.min(desiredCols, 2)
+    : desiredCols;
+
+  document.getElementById("container").style.setProperty("--cols", effectiveCols);
+
+  document.getElementById("zoomInBtn").disabled = zoomIndex === 0;
+  document.getElementById("zoomOutBtn").disabled =
+    zoomIndex === ZOOM_LEVELS.length - 1;
+
   try {
-    localStorage.setItem("archiveZoomCols", cols);
+    localStorage.setItem("archiveZoomIndex", String(zoomIndex));
   } catch (e) {
     /* localStorage unavailable, ignore */
   }
-  document.querySelectorAll(".zoom-btn").forEach((btn) => {
-    btn.classList.toggle("active", btn.dataset.cols === String(cols));
-  });
+}
+
+function zoomIn() {
+  if (zoomIndex === 0) return;
+  zoomIndex -= 1;
+  applyZoom();
+}
+
+function zoomOut() {
+  if (zoomIndex === ZOOM_LEVELS.length - 1) return;
+  zoomIndex += 1;
+  applyZoom();
 }
 
 function initZoomControls() {
-  document.querySelectorAll(".zoom-btn").forEach((btn) => {
-    btn.addEventListener("click", () => setZoom(btn.dataset.cols));
-  });
-
-  let saved = DEFAULT_COLS;
   try {
-    saved = localStorage.getItem("archiveZoomCols") || DEFAULT_COLS;
+    const saved = localStorage.getItem("archiveZoomIndex");
+    if (saved !== null && ZOOM_LEVELS[Number(saved)] !== undefined) {
+      zoomIndex = Number(saved);
+    }
   } catch (e) {
     /* localStorage unavailable, ignore */
   }
-  setZoom(saved);
+
+  document.getElementById("zoomInBtn").addEventListener("click", zoomIn);
+  document.getElementById("zoomOutBtn").addEventListener("click", zoomOut);
+  mobileZoomCap.addEventListener("change", applyZoom);
+
+  applyZoom();
+}
+
+function initBackButton() {
+  document.getElementById("backToGridBtn").addEventListener("click", () => {
+    window.location.hash = "";
+  });
 }
 
 /* -------------------- detail view -------------------- */
@@ -139,6 +172,7 @@ function showGrid() {
   document.getElementById("gridView").hidden = false;
   document.getElementById("detailView").hidden = true;
   document.getElementById("zoomControls").hidden = false;
+  document.getElementById("backToGridBtn").hidden = true;
   document.title = SITE_TITLE;
   window.scrollTo(0, 0);
 }
@@ -155,6 +189,7 @@ function showDetail(slug) {
   document.getElementById("gridView").hidden = true;
   document.getElementById("detailView").hidden = false;
   document.getElementById("zoomControls").hidden = true;
+  document.getElementById("backToGridBtn").hidden = false;
   document.title = `${allItems[idx].title} — ${SITE_TITLE}`;
   window.scrollTo(0, 0);
 }
@@ -186,6 +221,7 @@ fetch("content.json")
     itemSlugs = buildSlugs(data);
     renderGrid(allItems, itemSlugs, "container");
     initZoomControls();
+    initBackButton();
     observeTiles();
     route();
   })
