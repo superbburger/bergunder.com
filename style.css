@@ -1,16 +1,15 @@
 :root {
   margin: 0;
   padding: 0;
-  --accent-500: #e04908;
+  --accent-500: #2e63d4;
   --neutral-100: #fcf4f1;
   --primary: #333333;
-  --link: #1a4b5b;
+  --link: #2e63d4;
 }
 
 html {
   font-size: 16px;
   font-family:
-    "Inter Tight",
     "Helvetica Neue",
     "Helvetica",
     -apple-system,
@@ -51,22 +50,26 @@ a:active {
 
 h1 {
   font-size: 4rem;
-  font-weight: 400;
-  line-height: 4rem;
+  font-weight: 500;
+  line-height: 3.4rem;
   padding: 0;
   margin: 0;
-  font-family: "Inter Tight", "Helvetica Neue", Helvetica, sans-serif, Arial;
+  font-family: "Helvetica Neue", Helvetica, sans-serif, Arial;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
 }
 
 h2,
 .title {
   font-size: 2.5rem;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 2.5rem;
   padding: 0;
   margin: 0;
   vertical-align: baseline;
-  font-family: "Inter Tight", "Helvetica Neue", Helvetica, sans-serif, Arial;
+  font-family: "Helvetica Neue", Helvetica, sans-serif, Arial;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
 }
 
 h3 {
@@ -114,11 +117,13 @@ p.small,
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 12px 18px;
+  padding: 12px 12px;
   box-sizing: border-box;
   justify-content: space-between;
-  background-color: #fff;
+  background-color: #ffffffdd;
   z-index: 100;
+  border-bottom: 1px solid var(--primary);
+  backdrop-filter: blur(8px);
 }
 
 .heading-controls {
@@ -128,8 +133,8 @@ p.small,
   flex-shrink: 0;
 }
 .heading-name {
-  font-size: 0.75rem;
-  font-weight: 400;
+  font-size: 1rem;
+  font-weight: 500;
   line-height: 2rem;
   text-transform: uppercase;
 }
@@ -175,7 +180,7 @@ p.small,
 
 .container {
   --cols: 2;
-  padding: 4rem 12px 4rem;
+  padding: 56px 12px 4rem;
   display: grid;
   grid-template-columns: repeat(var(--cols), 1fr);
   align-items: start;
@@ -184,7 +189,7 @@ p.small,
 .intro {
   color: var(--primary);
   grid-column: 1 / -1;
-  padding: 12px;
+  padding: 12px 0;
   display: grid;
   grid-template-columns: 2fr 1fr;
   align-items: baseline;
@@ -221,18 +226,18 @@ p.small,
   height: 100%;
   object-fit: cover;
   display: block;
-  opacity: 0.95;
+  opacity: 1;
   transition: opacity 0.25s ease;
 }
 .tile:hover .tile-image-container img {
-  opacity: 1;
+  opacity: 0.8;
 }
 .tile-title {
   padding-top: 0.25rem;
-  font-size: 0.75rem;
+  font-size: 1.25rem;
   line-height: 1.25rem;
   color: var(--primary);
-  font-weight: 400;
+  font-weight: 500;
   text-transform: uppercase;
 }
 .tile:hover .tile-title {
@@ -284,7 +289,7 @@ p.small,
   min-height: 480px;
   display: grid;
   grid-template-columns: 1fr 2fr;
-  border-top: solid 1px #333;
+  /* border-top: solid 1px #333; */
   padding-top: 8px;
   margin-bottom: 8rem;
   opacity: 0;
@@ -295,7 +300,7 @@ p.small,
 
 div.info {
   position: sticky;
-  top: 0;
+  top: 56px;
   display: grid;
   align-content: start;
   align-self: flex-start;
@@ -348,6 +353,7 @@ img.image {
   flex-direction: column;
   align-items: end;
   gap: 0.25rem;
+  text-transform: uppercase;
 }
 
 .item .badge {
@@ -368,7 +374,7 @@ img.image {
 
 .item .title {
   color: var(--primary);
-  padding: 8px 0;
+  margin-bottom: 1rem;
   width: fit-content;
 }
 .item .project {
@@ -406,7 +412,7 @@ img.image {
 .item .credits {
   grid-area: description;
   display: flex;
-  justify-content: end;
+  justify-content: start;
   align-items: end;
   opacity: 1;
 }
