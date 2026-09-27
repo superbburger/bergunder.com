@@ -1,414 +1,498 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Film Archive</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Film Archive</title>
 
-    :root {
-      --bg:      #ffffff;
-      --fg:      #111111;
-      --muted:   #999999;
-      --mono:    'Space Mono', monospace;
-    }
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-    body {
-      background: var(--bg);
-      color: var(--fg);
-      font-family: var(--mono);
-      min-height: 100vh;
-      padding: 0 0 80px;
-    }
+      :root {
+        --bg: #ffffff;
+        --fg: #333;
+        --muted: #666666;
+        --border-color: #eee;
+      }
 
-    /* ── Header ── */
-    header {
-      padding: 48px 40px 40px;
-      border-bottom: 1px solid #e0e0e0;
-      display: flex;
-      align-items: baseline;
-      gap: 24px;
-    }
-    header h1 {
-      font-size: clamp(1rem, 2.5vw, 1.2rem);
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-    }
-    header .tagline {
-      font-size: 0.7rem;
-      color: var(--muted);
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: "Areal", "Helvetica Neue", "Helvetica", sans-serif;
+        min-height: 100vh;
+        padding: 0 2rem 80px;
+      }
 
-    /* ── Status ── */
-    #status {
-      padding: 60px 40px;
-      font-size: 0.7rem;
-      color: var(--muted);
-      letter-spacing: 0.1em;
-    }
+      /* ── Header ── */
+      header {
+        padding: 2rem 0;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+        align-items: baseline;
+        gap: 0;
+      }
+      header h1 {
+        font-size: 4rem;
+        font-weight: 500;
+        line-height: 3.4rem;
+        padding: 0;
+        margin: 0;
+        font-family: "Helvetica Neue", Helvetica, sans-serif, Arial;
+        text-transform: uppercase;
+        letter-spacing: -0.03em;
+      }
+      header h4 {
+        font-size: 2rem;
+        font-weight: 500;
+        text-transform: uppercase;
+      }
+      header .tagline {
+        font-size: 1.4rem;
+        color: var(--muted);
+      }
 
-    /* ── Roll section ── */
-    .roll {
-      margin-top: 52px;
-    }
+      /* ── Status ── */
+      #status {
+        padding: 60px 40px;
+        font-size: 1rem;
+        color: var(--muted);
+      }
 
-    .roll-header {
-      padding: 0 40px 12px;
-      display: flex;
-      align-items: baseline;
-      gap: 16px;
-      border-bottom: 1px solid #e0e0e0;
-      margin-bottom: 0;
-    }
-    .roll-date {
-      font-size: 0.65rem;
-      color: var(--muted);
-      letter-spacing: 0.08em;
-    }
-    .roll-title {
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-    .roll-count {
-      font-size: 0.65rem;
-      color: var(--muted);
-      margin-left: auto;
-      letter-spacing: 0.08em;
-    }
+      /* ── Roll section ── */
+      .roll {
+        margin-top: 52px;
+      }
 
-    /* ── Carousel outer (fade edges) ── */
-    .carousel-outer {
-      position: relative;
-      overflow: hidden;
-    }
-    .carousel-outer::before,
-    .carousel-outer::after {
-      content: '';
-      position: absolute;
-      top: 0; bottom: 0;
-      width: 40px;
-      z-index: 10;
-      pointer-events: none;
-    }
-    .carousel-outer::before { left: 0;  background: linear-gradient(to right, #fff, transparent); }
-    .carousel-outer::after  { right: 0; background: linear-gradient(to left,  #fff, transparent); }
+      .roll-header {
+        padding: 0 0 12px;
+        display: flex;
+        align-items: baseline;
+        gap: 16px;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 0;
+      }
+      .roll-date {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--muted);
+      }
+      .roll-title {
+        font-size: 0.875rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .roll-count {
+        font-size: 0.875rem;
+        color: var(--muted);
+        margin-left: auto;
+      }
 
-    /* ── Carousel track ── */
-    .carousel {
-      display: flex;
-      align-items: flex-start;
-      overflow-x: auto;
-      overflow-y: hidden;
-      scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-      cursor: grab;
-      user-select: none;
-      padding: 20px 40px;
-      gap: 12px;
-    }
-    .carousel::-webkit-scrollbar { display: none; }
-    .carousel.grabbing { cursor: grabbing; }
+      /* ── Carousel outer (fade edges) ── */
+      .carousel-outer {
+        position: relative;
+        overflow: hidden;
+      }
+      /* .carousel-outer::before,
+      .carousel-outer::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 40px;
+        z-index: 10;
+        pointer-events: none;
+      }
+      .carousel-outer::before {
+        left: 0;
+        background: linear-gradient(to right, #fff, transparent);
+      }
+      .carousel-outer::after {
+        right: 0;
+        background: linear-gradient(to left, #fff, transparent);
+      } */
 
-    /* ── Frame ── */
-    .frame {
-      flex: none;
-      scroll-snap-align: start;
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-      width: 300px;
-      height: 220px;
-      background: #f0f0f0;
-    }
-    .frame img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: opacity 0.25s ease;
-      pointer-events: none;
-    }
-    .frame:hover img { opacity: 0.88; }
+      /* ── Carousel track ── */
+      .carousel {
+        display: flex;
+        align-items: flex-start;
+        overflow-x: auto;
+        overflow-y: hidden;
+        /* scroll-snap-type: x proximity; */
+        /* scroll-snap-stop: normal; */
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        cursor: grab;
+        user-select: none;
+        padding: 20px 0 40px;
+        gap: 12px;
+      }
+      .carousel::-webkit-scrollbar {
+        display: none;
+      }
+      .carousel.grabbing {
+        cursor: grabbing;
+      }
 
-    .frame-num {
-      position: absolute;
-      bottom: 6px;
-      right: 8px;
-      font-size: 0.55rem;
-      color: rgba(255,255,255,0.5);
-      letter-spacing: 0.12em;
-      line-height: 1;
-    }
+      /* ── Frame ── */
+      .frame {
+        flex: none;
+        scroll-snap-align: start;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        width: auto;
+        height: 266px;
+        background: #f0f0f0;
+      }
+      .frame img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: opacity 0.25s ease;
+        pointer-events: none;
+      }
+      .frame:hover img {
+        opacity: 0.88;
+      }
 
-    /* ── Lightbox ── */
-    #lightbox {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(255,255,255,0.96);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 16px;
-    }
-    #lightbox.open { display: flex; }
+      .frame-num {
+        position: absolute;
+        bottom: 6px;
+        right: 8px;
+        font-size: 0.55rem;
+        color: rgba(255, 255, 255, 0.5);
+        letter-spacing: 0.12em;
+        line-height: 1;
+      }
 
-    #lightbox img {
-      max-width: min(90vw, 1200px);
-      max-height: 82vh;
-      object-fit: contain;
-    }
-    #lightbox-meta {
-      font-size: 0.6rem;
-      color: var(--muted);
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      text-align: center;
-    }
+      /* ── Lightbox ── */
+      #lightbox {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.96);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 16px;
+      }
+      #lightbox.open {
+        display: flex;
+      }
 
-    #lightbox-close {
-      position: fixed;
-      top: 24px; right: 28px;
-      background: none;
-      border: none;
-      color: var(--fg);
-      font-family: var(--mono);
-      font-size: 1rem;
-      cursor: pointer;
-      opacity: 0.4;
-      transition: opacity 0.2s;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-    }
-    #lightbox-close:hover { opacity: 1; }
+      #lightbox img {
+        max-width: min(90vw, 1200px);
+        max-height: 82vh;
+        object-fit: contain;
+      }
+      #lightbox-meta {
+        font-size: 0.6rem;
+        color: var(--muted);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        text-align: center;
+      }
 
-    #lightbox-prev, #lightbox-next {
-      position: fixed;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: var(--fg);
-      font-family: var(--mono);
-      font-size: 1.2rem;
-      cursor: pointer;
-      opacity: 0.25;
-      transition: opacity 0.2s;
-      padding: 24px 20px;
-    }
-    #lightbox-prev:hover, #lightbox-next:hover { opacity: 0.8; }
-    #lightbox-prev { left: 8px; }
-    #lightbox-next { right: 8px; }
+      #lightbox-close {
+        position: fixed;
+        top: 24px;
+        right: 28px;
+        background: none;
+        border: none;
+        color: var(--fg);
+        font-size: 1rem;
+        cursor: pointer;
+        opacity: 0.4;
+        transition: opacity 0.2s;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      #lightbox-close:hover {
+        opacity: 1;
+      }
 
-    /* ── Responsive ── */
-    @media (max-width: 600px) {
-      header { padding: 28px 20px 24px; flex-direction: column; gap: 4px; }
-      .roll-header { padding: 0 20px 10px; }
-      .carousel { padding: 16px 20px; gap: 8px; }
-      .carousel-outer::before,
-      .carousel-outer::after { width: 20px; }
-      .frame { width: 240px; height: 180px; }
-    }
+      #lightbox-prev,
+      #lightbox-next {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--fg);
+        font-size: 1.2rem;
+        cursor: pointer;
+        opacity: 0.25;
+        transition: opacity 0.2s;
+        padding: 24px 20px;
+      }
+      #lightbox-prev:hover,
+      #lightbox-next:hover {
+        opacity: 0.8;
+      }
+      #lightbox-prev {
+        left: 8px;
+      }
+      #lightbox-next {
+        right: 8px;
+      }
 
-    @media (prefers-reduced-motion: reduce) {
-      .frame img { transition: none; }
-    }
-  </style>
-</head>
-<body>
+      /* ── Responsive ── */
+      @media (max-width: 600px) {
+        header {
+          padding: 28px 20px 24px;
+          flex-direction: column;
+          gap: 4px;
+        }
+        .roll-header {
+          padding: 0 20px 10px;
+        }
+        .carousel {
+          padding: 16px 20px;
+          gap: 8px;
+        }
+        .carousel-outer::before,
+        .carousel-outer::after {
+          width: 20px;
+        }
+        .frame {
+          width: 240px;
+          height: 180px;
+        }
+      }
 
-<header>
-  <h1>Film Archive</h1>
-  <span class="tagline">35mm</span>
-</header>
+      @media (prefers-reduced-motion: reduce) {
+        .frame img {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h4>Aaron's</h4>
+      <h1>Film Archive</h1>
+    </header>
 
-<div id="status">Loading…</div>
-<div id="archive"></div>
+    <div id="status">Loading…</div>
+    <div id="archive"></div>
 
-<div id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
-  <button id="lightbox-close" aria-label="Close">close</button>
-  <button id="lightbox-prev" aria-label="Previous">‹</button>
-  <img id="lightbox-img" src="" alt="" />
-  <div id="lightbox-meta"></div>
-  <button id="lightbox-next" aria-label="Next">›</button>
-</div>
+    <div
+      id="lightbox"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Photo viewer"
+    >
+      <button id="lightbox-close" aria-label="Close">close</button>
+      <button id="lightbox-prev" aria-label="Previous">‹</button>
+      <img id="lightbox-img" src="" alt="" />
+      <div id="lightbox-meta"></div>
+      <button id="lightbox-next" aria-label="Next">›</button>
+    </div>
 
-<script>
-  const MANIFEST     = 'manifest.json';
-  const FRAME_WIDTH  = 300;
-  const FRAME_HEIGHT = 220;
+    <script>
+      const MANIFEST = "manifest.json";
+      const FRAME_WIDTH = 300;
+      const FRAME_HEIGHT = 220;
 
-  let lightboxFrames = [];
-  let lightboxIdx    = 0;
+      let lightboxFrames = [];
+      let lightboxIdx = 0;
 
-  const archive  = document.getElementById('archive');
-  const status   = document.getElementById('status');
-  const lightbox = document.getElementById('lightbox');
-  const lbImg    = document.getElementById('lightbox-img');
-  const lbMeta   = document.getElementById('lightbox-meta');
+      const archive = document.getElementById("archive");
+      const status = document.getElementById("status");
+      const lightbox = document.getElementById("lightbox");
+      const lbImg = document.getElementById("lightbox-img");
+      const lbMeta = document.getElementById("lightbox-meta");
 
-  // ── Lightbox ──────────────────────────────────────────────────────────────
-  function openLightbox(frames, idx) {
-    lightboxFrames = frames;
-    lightboxIdx = idx;
-    showFrame();
-    lightbox.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeLightbox() {
-    lightbox.classList.remove('open');
-    document.body.style.overflow = '';
-  }
-  function showFrame() {
-    const f = lightboxFrames[lightboxIdx];
-    lbImg.src = f.src;        // ← full-res original for lightbox
-    lbImg.alt = `${f.roll} — frame ${f.index + 1}`;
-    lbMeta.textContent =
-      `${f.roll}  ·  ${String(f.index + 1).padStart(2,'0')} / ${String(lightboxFrames.length).padStart(2,'0')}`;
-  }
-  function step(dir) {
-    lightboxIdx = (lightboxIdx + dir + lightboxFrames.length) % lightboxFrames.length;
-    showFrame();
-  }
+      // ── Lightbox ──────────────────────────────────────────────────────────────
+      function openLightbox(frames, idx) {
+        lightboxFrames = frames;
+        lightboxIdx = idx;
+        showFrame();
+        lightbox.classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+      function closeLightbox() {
+        lightbox.classList.remove("open");
+        document.body.style.overflow = "";
+      }
+      function showFrame() {
+        const f = lightboxFrames[lightboxIdx];
+        lbImg.src = f.src; // ← full-res original for lightbox
+        lbImg.alt = `${f.roll} — frame ${f.index + 1}`;
+        lbMeta.textContent = `${String(f.index + 1).padStart(2, "0")} / ${String(lightboxFrames.length).padStart(2, "0")}`;
+      }
+      function step(dir) {
+        lightboxIdx =
+          (lightboxIdx + dir + lightboxFrames.length) % lightboxFrames.length;
+        showFrame();
+      }
 
-  document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
-  document.getElementById('lightbox-prev').addEventListener('click', () => step(-1));
-  document.getElementById('lightbox-next').addEventListener('click', () => step(1));
-  lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
-  document.addEventListener('keydown', e => {
-    if (!lightbox.classList.contains('open')) return;
-    if (e.key === 'Escape')     closeLightbox();
-    if (e.key === 'ArrowLeft')  step(-1);
-    if (e.key === 'ArrowRight') step(1);
-  });
+      document
+        .getElementById("lightbox-close")
+        .addEventListener("click", closeLightbox);
+      document
+        .getElementById("lightbox-prev")
+        .addEventListener("click", () => step(-1));
+      document
+        .getElementById("lightbox-next")
+        .addEventListener("click", () => step(1));
+      lightbox.addEventListener("click", (e) => {
+        if (e.target === lightbox) closeLightbox();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (!lightbox.classList.contains("open")) return;
+        if (e.key === "Escape") closeLightbox();
+        if (e.key === "ArrowLeft") step(-1);
+        if (e.key === "ArrowRight") step(1);
+      });
 
-  // ── Drag-to-scroll ────────────────────────────────────────────────────────
-  function enableDragScroll(el) {
-    let down = false, startX, scrollLeft;
-    el.addEventListener('mousedown', e => {
-      down = true; el.classList.add('grabbing');
-      startX = e.pageX - el.offsetLeft; scrollLeft = el.scrollLeft;
-    });
-    document.addEventListener('mouseup', () => { down = false; el.classList.remove('grabbing'); });
-    el.addEventListener('mousemove', e => {
-      if (!down) return;
-      e.preventDefault();
-      el.scrollLeft = scrollLeft - (e.pageX - el.offsetLeft - startX);
-    });
-  }
+      // ── Drag-to-scroll ────────────────────────────────────────────────────────
+      function enableDragScroll(el) {
+        let down = false,
+          startX,
+          scrollLeft;
+        el.addEventListener("mousedown", (e) => {
+          down = true;
+          el.classList.add("grabbing");
+          startX = e.pageX - el.offsetLeft;
+          scrollLeft = el.scrollLeft;
+        });
+        document.addEventListener("mouseup", () => {
+          down = false;
+          el.classList.remove("grabbing");
+        });
+        el.addEventListener("mousemove", (e) => {
+          if (!down) return;
+          e.preventDefault();
+          el.scrollLeft = scrollLeft - (e.pageX - el.offsetLeft - startX);
+        });
+      }
 
-  // ── Date formatting ───────────────────────────────────────────────────────
-  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      // ── Date formatting ───────────────────────────────────────────────────────
+      const MONTHS = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
 
-  function formatDate(yyyymmdd) {
-    const y = yyyymmdd.slice(0, 4);
-    const m = parseInt(yyyymmdd.slice(4, 6), 10) - 1;
-    const d = parseInt(yyyymmdd.slice(6, 8), 10);
-    return `${MONTHS[m]} ${d}, ${y}`;
-  }
+      function formatDate(yyyymmdd) {
+        const y = yyyymmdd.slice(0, 4);
+        const m = parseInt(yyyymmdd.slice(4, 6), 10) - 1;
+        const d = parseInt(yyyymmdd.slice(6, 8), 10);
+        return `${MONTHS[m]} ${d}, ${y}`;
+      }
 
-  function formatDateRange(start, end) {
-    if (!start) return null;
-    if (start === end) return formatDate(start);
-    const ds = formatDate(start);
-    const de = formatDate(end);
-    // If same year, drop the year from the start date
-    if (start.slice(0, 4) === end.slice(0, 4)) {
-      const shortStart = ds.replace(/, \d{4}$/, '');
-      return `${shortStart} – ${de}`;
-    }
-    return `${ds} – ${de}`;
-  }
+      function formatDateRange(start, end) {
+        if (!start) return null;
+        if (start === end) return formatDate(start);
+        const ds = formatDate(start);
+        const de = formatDate(end);
+        // If same year, drop the year from the start date
+        if (start.slice(0, 4) === end.slice(0, 4)) {
+          const shortStart = ds.replace(/, \d{4}$/, "");
+          return `${shortStart} – ${de}`;
+        }
+        return `${ds} – ${de}`;
+      }
 
-  // ── Build roll ────────────────────────────────────────────────────────────
-  function buildRoll(roll, rollIndex) {
-    const section = document.createElement('section');
-    section.className = 'roll';
+      // ── Build roll ────────────────────────────────────────────────────────────
+      function buildRoll(roll, rollIndex) {
+        const section = document.createElement("section");
+        section.className = "roll";
 
-    const dateStr = formatDateRange(roll.date_start, roll.date_end);
+        const dateStr = formatDateRange(roll.date_start, roll.date_end);
 
-    const header = document.createElement('div');
-    header.className = 'roll-header';
-    header.innerHTML = `
-      <span class="roll-title">${roll.title || roll.id}</span>
-      ${dateStr ? `<span class="roll-date">${dateStr}</span>` : ''}
+        const header = document.createElement("div");
+        header.className = "roll-header";
+        header.innerHTML = `
+      <!-- <span class="roll-title">${roll.title || roll.id}</span> -->
+      ${dateStr ? `<span class="roll-date">${dateStr}</span>` : ""}
       <span class="roll-count">${roll.frames.length} frames</span>
     `;
 
-    const frames = roll.frames.map((f, i) => ({
-      src:   f.src   ?? f,   // support legacy string format
-      thumb: f.thumb ?? f.src ?? f,
-      roll:  roll.title || roll.id,
-      index: i
-    }));
+        const frames = roll.frames.map((f, i) => ({
+          src: f.src ?? f, // support legacy string format
+          thumb: f.thumb ?? f.src ?? f,
+          roll: roll.title || roll.id,
+          index: i,
+        }));
 
-    const outer = document.createElement('div');
-    outer.className = 'carousel-outer';
+        const outer = document.createElement("div");
+        outer.className = "carousel-outer";
 
-    const track = document.createElement('div');
-    track.className = 'carousel';
-    track.setAttribute('aria-label', `${roll.title || roll.id}`);
-    enableDragScroll(track);
+        const track = document.createElement("div");
+        track.className = "carousel";
+        track.setAttribute("aria-label", `${roll.title || roll.id}`);
+        enableDragScroll(track);
 
-    frames.forEach((f, i) => {
-      const frame = document.createElement('div');
-      frame.className = 'frame';
-      frame.style.width  = FRAME_WIDTH + 'px';
-      frame.style.height = FRAME_HEIGHT + 'px';
+        frames.forEach((f, i) => {
+          const frame = document.createElement("div");
+          frame.className = "frame";
+          // frame.style.width = FRAME_WIDTH + "px";
+          // frame.style.height = FRAME_HEIGHT + "px";
 
-      const img = document.createElement('img');
-      img.src = f.thumb;     // ← thumbnail for carousel
-      img.alt = `Frame ${i + 1}`;
-      img.loading = 'lazy';
+          const img = document.createElement("img");
+          img.src = f.thumb; // ← thumbnail for carousel
+          img.alt = `Frame ${i + 1}`;
+          img.loading = "lazy";
 
-      const num = document.createElement('span');
-      num.className = 'frame-num';
-      num.textContent = String(i + 1).padStart(2, '0');
+          const num = document.createElement("span");
+          num.className = "frame-num";
+          num.textContent = String(i + 1).padStart(2, "0");
 
-      frame.appendChild(img);
-      frame.appendChild(num);
-      frame.addEventListener('click', () => openLightbox(frames, i));
-      track.appendChild(frame);
+          frame.appendChild(img);
+          frame.appendChild(num);
+          frame.addEventListener("click", () => openLightbox(frames, i));
+          track.appendChild(frame);
+        });
 
-    });
+        outer.appendChild(track);
+        section.appendChild(header);
+        section.appendChild(outer);
+        return section;
+      }
 
-    outer.appendChild(track);
-    section.appendChild(header);
-    section.appendChild(outer);
-    return section;
-  }
+      // ── Init ──────────────────────────────────────────────────────────────────
+      async function init() {
+        let manifest;
+        try {
+          const res = await fetch(MANIFEST);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          manifest = await res.json();
+        } catch (err) {
+          status.textContent = `Could not load manifest.json — ${err.message}`;
+          return;
+        }
+        if (!manifest.rolls || manifest.rolls.length === 0) {
+          status.textContent = "No rolls found in manifest.json.";
+          return;
+        }
+        status.remove();
+        manifest.rolls.forEach((roll, i) =>
+          archive.appendChild(buildRoll(roll, i)),
+        );
+      }
 
-  // ── Init ──────────────────────────────────────────────────────────────────
-  async function init() {
-    let manifest;
-    try {
-      const res = await fetch(MANIFEST);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      manifest = await res.json();
-    } catch (err) {
-      status.textContent = `Could not load manifest.json — ${err.message}`;
-      return;
-    }
-    if (!manifest.rolls || manifest.rolls.length === 0) {
-      status.textContent = 'No rolls found in manifest.json.';
-      return;
-    }
-    status.remove();
-    manifest.rolls.forEach((roll, i) => archive.appendChild(buildRoll(roll, i)));
-  }
-
-  init();
-</script>
-</body>
+      init();
+    </script>
+  </body>
 </html>
